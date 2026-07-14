@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combine Super Hero Runner - Pure CSS 3D</title>
+    <style>
+        /* Полный экран без прокрутки и рамок */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #111a2e 0%, #2c3e50 70%, #111625 100%);
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+        }
+
+        /* Анимация вращения щита Кэпа */
+        @keyframes shield-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .cap-shield {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #ffffff 0%, #ffffff 15%, #ff3333 16%, #ff3333 40%, #0066ff 41%, #0066ff 70%, #ff3333 71%, #ff3333 100%);
+            border-radius: 50%;
+            vertical-align: middle;
+            margin: 0 4px;
+            position: relative;
+            box-shadow: 0 0 12px #00f0ff;
+            animation: shield-spin 8s infinite linear;
+        }
+        .cap-shield::after {
+            content: "★";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -53%);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* ТРЁХМЕРНОЕ ШОССЕ ГОРОДА */
+        .road-3d {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background-color: #4f5d65;
+            border-top: 4px solid #f1c40f;
+            box-shadow: inset 0 20px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Бесконечно летящие линии разметки асфальта */
+        @keyframes line-move {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100px); }
+        }
+        .road-line {
+            position: absolute;
+            top: 60px;
+            width: 60px;
+            height: 8px;
+            background-color: #f1c40f;
+            animation: line-move 2s infinite linear;
+        }
+
+        /* ТРЁХМЕРНЫЙ КУБ СУПЕРГЕРОЯ */
+        .player-3d {
+            position: absolute;
+            left: 100px;
+            bottom: 110px;
+            width: 50px;
+            height: 70px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: transform 0.1s ease, background 0.2s;
+            z-index: 50;
+        }
+
+        /* Фирменные стили скинов блогеров */
+        .skin-flash { background: linear-gradient(135deg, #ff1a75, #99003d); box-shadow: 0 0 20px #ff007f; }
+        .skin-a4 { background: linear-gradient(135deg, #ff6a00, #943e00); box-shadow: 0 0 20px #ff6a00; }
+        .skin-mi { background: linear-gradient(135deg, #ff66cc, #b30066); box-shadow: 0 0 20px #ff66cc; }
+
+        /* Эпичная CSS-анимация прыжка */
+        @keyframes hero-jump {
+            0% { bottom: 110px; transform: scaleY(1); }
+            40% { bottom: 260px; transform: scaleY(1.1); }
+            50% { bottom: 260px; transform: scaleY(1); }
+            60% { bottom: 260px; transform: scaleY(0.9); }
+            100% { bottom: 110px; transform: scaleY(1); }
+        }
+        .animate-jump {
+            animation: hero-jump 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* ОБЪЁМНЫЕ ТРЁХМЕРНЫЕ ЛОВУШКИ (БЕТОННЫЕ БЛОКИ) */
+        @keyframes block-fly {
+            0% { left: 100vw; }
+            100% { left: -100px; }
+        }
+        .obstacle-3d {
+            position: absolute;
+            bottom: 110px;
+            width: 40px;
+            height: 50px;
+            background: linear-gradient(135deg, #e67e22, #a84300);
+            border-radius: 6px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.4), inset -5px -5px 10px rgba(0,0,0,0.3);
+            animation: block-fly 2.5s infinite linear;
+            z-index: 40;
+        }
+
+        /* Зоны управления кликами */
+        .click-zone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            z-index: 100;
+            cursor: pointer;
+        }
+        .zone-left { left: 0; }
+        .zone-right { right: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ЗОНЫ ДЛЯ КЛИКОВ МЫШКОЙ (ЛЕВАЯ — СКИН, ПРАВАЯ — ПРЫЖОК) -->
+    <div onclick="clickSkinLeft()" class="click-zone zone-left" title="Сменить скин"></div>
+    <div onclick="clickPlayerJump()" class="click-zone zone-right" title="Прыгнуть"></div>
+
+    <!-- ТЕКСТОВЫЙ ИНТЕРФЕЙС ПОВЕРХ СЦЕНЫ -->
+    <div style="position: absolute; top: 25px; left: 30px; z-index: 80;">
+        <h1 style="color: #00f0ff; font-size: 2.2rem; margin: 0; text-shadow: 0 0 10px #00f0ff; font-weight: bold;">
+            C<span class="cap-shield"></span>mbine Super Hero Runner
+        </h1>
+        <div style="color: #ff007f; font-size: 0.85rem; font-weight: bold; letter-spacing: 2px;">DIMA.AI LABS</div>
+    </div>
+
+    <div style="position: absolute; top: 25px; right: 30px; z-index: 80; text-align: right; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 8px rgba(0,0,0,0.9);">
+        <div style="color: #00f0ff; margin-bottom: 5px;">БЛОГЕР: <span id="skin-title" style="color: #ffaa00;">ФЛЭШОВИЙ</span></div>
+        <div style="color: #ffaa00;">🏆 СЧЕТ: <span id="game-score">0</span></div>
+    </div>
+
+    <!-- НАСТОЯЩИЙ ОБЪЁМНЫЙ ГЕРОЙ -->
+    <div id="player" class="player-3d skin-flash">⚡</div>
+
+    <!-- ТРЁХМЕРНАЯ ТРАССА ГОРОДА И ДВИЖУЩИЕСЯ ОБЪЕКТЫ -->
+    <div class="road-3d">
+        <div class="road-line" style="animation-delay: 0s;"></div>
+        <div class="road-line" style="animation-delay: 0.5s; top: 90px;"></div>
+        <div class="road-line" style="animation-delay: 1s;"></div>
+        <div class="road-line" style="animation-delay: 1.5s; top: 90px;"></div>
+    </div>
+
+    <!-- ЛЕТЯЩИЙ БЕТОННЫЙ 3D-БЛОК -->
+    <div id="obstacle" class="obstacle-3d"></div>
+
+    <!-- ИСПРАВЛЕННЫЙ JS КОД С ПОДДЕРЖКОЙ КЛАВИАТУРЫ -->
+    <script>
+        var currentSkin = 0;
+        var skinClasses = ["skin-flash", "skin-a4", "skin-mi"];
+        var skinNames = ["ФЛЭШОВИЙ", "ВЛАД А4 😎", "МИЛАНА ХАМЕТОВА 🎤"];
+        var skinLogos = ["⚡", "A4", "МИ"];
+        
+        var score = 0;
+        var isJumping = false;
+
+        // Подключаем стрелочки на клавиатуре, чтобы можно было играть кнопками
+        window.addEventListener('keydown', function(e) {
+            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                e.preventDefault();
+                clickSkinLeft();
+            }
+            if (e.key === "ArrowUp" || e.key === "Space") {
+                e.preventDefault();
+                clickPlayerJump();
+            }
+        });
+
+        // Функция СМЕНЫ СКИНА (при клике слева или стрелках влево/вправо)
+        function clickSkinLeft() {
+            var hero = document.getElementById('player');
+            hero.classList.remove(skinClasses[currentSkin]);
+            currentSkin = (currentSkin + 1) % 3;
+            hero.classList.add(skinClasses[currentSkin]);
+            hero.innerText = skinLogos[currentSkin];
+            document.getElementById('skin-title').innerText = skinNames[currentSkin];
+        }
+
+        // Функция ПРЫЖОК (при клике справа или стрелке вверх/пробеле)
+        function clickPlayerJump() {
+            var hero = document.getElementById('player');
+            if (!isJumping) {
+                isJumping = true;
+                hero.classList.add('animate-jump');
+                
+                setTimeout(function() {
+                    hero.classList.remove('animate-jump');
+                    isJumping = false;
+                }, 700);
+            }
+        }
+
+        // Автоматический счет очков
+        setInterval(function() {
+            score++;
+            document.getElementById('game-score').innerText = score;
+        }, 1200);
+    </script>
+</body>
+</html>
+
+
+        function updateGame() {
+            if (!isPlaying) return;
+
+            // ФОН ГОРОДА
+            var bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGrad.addColorStop(0, city3D.bgTop);
+            bgGrad.addColorStop(0.7, city3D.bgBottom);
+            bgGrad.addColorStop(1, "#111625");
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // ДОРОГА
+            ctx.fillStyle = city3D.asphalt;
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            ctx.fillStyle = city3D.neonLine;
+            ctx.fillRect(0, groundY, canvas.width, 4);
+            for (var w = 0; w < canvas.width; w += 80) {
+                ctx.fillRect(w + ((Date.now() / 12) % 80), groundY + 40, 45, 6);
+            }
+
+            // Гравитация
+            player.vy += player.gravity; player.y += player.vy;
+            var floorY = groundY - player.height;
+            if (player.y >= floorY) { 
+                player.y = floorY; 
+                player.vy = 0; 
+                player.isJumping = false; 
+            }
+
+            // ОТРИСОВКА НЕОНОВОГО КУБИКА
+            ctx.save();
+            var cubeGrad = ctx.createLinearGradient(player.x, player.y, player.x + player.width, player.y + player.height);
+            if (currentSkinIndex === 0) { cubeGrad.addColorStop(0, '#ff1a75'); cubeGrad.addColorStop(1, '#99003d'); ctx.shadowColor = "#ff007f"; }
+            else if (currentSkinIndex === 1) { cubeGrad.addColorStop(0, '#ff6a00'); cubeGrad.addColorStop(1, '#943e00'); ctx.shadowColor = "#ff6a00"; }
+            else if (currentSkinIndex === 2) { cubeGrad.addColorStop(0, '#ff66cc'); cubeGrad.addColorStop(1, '#b30066'); ctx.shadowColor = "#ff66cc"; }
+            
+            ctx.fillStyle = cubeGrad; ctx.shadowBlur = 15;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = "#ffffff"; ctx.font = "bold 20px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            if (currentSkinIndex === 0) {
+                ctx.fillStyle = "#f1c40f"; ctx.beginPath();
+                ctx.moveTo(player.x + 15, player.y + 12); ctx.lineTo(player.x + 35, player.y + 26);
+                ctx.lineTo(player.x + 20, player.y + 28); ctx.lineTo(player.x + 30, player.y + 48); ctx.fill();
+            } else {
+                ctx.fillText(skinTexts[currentSkinIndex], player.x + player.width / 2, player.y + player.height / 2);
+            }
+            ctx.restore();
+
+            // СПАВН ОБЫЧНЫХ ОРАНЖЕВЫХ БЛОКОВ ПО ЗЕМЛЕ (КАК НА СКРИНШОТЕ)
+            spawnTimer++;
+            if (spawnTimer > 120) {
+                if (Math.random() < 0.4) { // Появляются иногда
